@@ -1,0 +1,54 @@
+# =====================
+# LOGS
+# =====================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =====================
+# DEPENDENCIES
+# =====================
+node_modules/
+
+# =====================
+# BUILD OUTPUT (Vite)
+# =====================
+dist/
+dist-ssr/
+
+# =====================
+# ENV FILES (CRÍTICO)
+# =====================
+.env
+.env.local
+.env.*
+*.local
+!.env.example
+
+# =====================
+# CACHE
+# =====================
+.cache/
+.vite/
+
+# =====================
+# BACKEND (NO VA A VERCEL)
+# =====================
+EcommerceBack-master/
+
+# =====================
+# EDITORS / OS
+# =====================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

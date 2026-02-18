@@ -28,6 +28,7 @@ const Products: React.FC = () => {
         ecommerceService.getProducts(),
         ecommerceService.getCategories()
       ]);
+      console.log("PRODUCTS BACK:", prodRes.data);
       setProducts(prodRes.data);
       setCategories(catRes.data);
     } catch (error) {

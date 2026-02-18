@@ -21,7 +21,7 @@ const Dashboard: React.FC = () => {
     try {
       const [cRes, pRes, oRes, hRes] = await Promise.all([
         ecommerceService.getClients(),
-        ecommerceService.getProducts(true),
+        ecommerceService.getProducts(),
         ecommerceService.getOrders(),
         ecommerceService.getHealth()
       ]);

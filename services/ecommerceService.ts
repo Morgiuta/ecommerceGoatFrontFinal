@@ -16,13 +16,40 @@ export const ecommerceService = {
   deleteClient: (id: number) => api.delete(`clients/id/${id}`),
 
   // Products
-  getProducts: (includeInactive = false) => api.get<Product[]>(`products/?include_inactive=${includeInactive}`),
+  async getProducts() {
+    const res = await api.get('/products');
+  
+    return {
+      ...res,
+      data: res.data.map((p: any) => ({
+        id: p.id_key,
+        name: p.name,
+        description: p.description ?? '',
+        price: p.price,
+        stock: p.stock,
+        category_id: p.category_id,
+        category: p.category,
+        active: p.active
+      }))
+    };
+  },
+  
   createProduct: (data: any) => api.post('products/', data),
   updateProduct: (id: number, data: any) => api.put(`products/id/${id}`, data),
   deleteProduct: (id: number) => api.delete(`products/id/${id}`),
 
   // Categories
-  getCategories: () => api.get<Category[]>('categories/'),
+  async getCategories() {
+    const res = await api.get('/categories');
+  
+    return {
+      ...res,
+      data: res.data.map((c: any) => ({
+        id: c.id_key,
+        name: c.name
+      }))
+    };
+  },
   createCategory: (data: any) => api.post('categories/', data),
   updateCategory: (id: number, data: any) => api.put(`categories/id/${id}`, data),
   deleteCategory: (id: number) => api.delete(`categories/id/${id}`),
@@ -40,6 +67,7 @@ export const ecommerceService = {
 
   // Addresses
   getAddresses: () => api.get<Address[]>('addresses/'),
+  getAddressesByClient: (clientId: number) => api.get<Address[]>(`addresses?client_id=${clientId}`),
   createAddress: (data: any) => api.post('addresses/', data),
   deleteAddress: (id: number) => api.delete(`addresses/id/${id}`),
 

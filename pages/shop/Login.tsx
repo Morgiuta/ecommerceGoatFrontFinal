@@ -56,6 +56,20 @@ const Login: React.FC = () => {
         >
           {loading ? "CARGANDO..." : "INGRESAR"}
         </button>
+
+        <div className="text-center pt-2">
+          <span className="text-slate-400 text-sm font-medium">
+            ¿No tenés cuenta?
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => navigate('/register')}
+          className="w-full border border-slate-200 text-slate-700 py-4 rounded-2xl font-black text-lg hover:bg-slate-50 transition-all"
+        >
+          REGISTRARSE
+        </button>
       </form>
     </div>
   );

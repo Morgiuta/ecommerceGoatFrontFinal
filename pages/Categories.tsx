@@ -17,13 +17,21 @@ const Categories: React.FC = () => {
     setLoading(true);
     try {
       const res = await ecommerceService.getCategories();
-      setCategories(res.data);
+  
+      const normalized = res.data.map((cat: any) => ({
+        id: cat.id_key,
+        name: cat.name,
+        description: cat.description ?? '' // porque no viene del backend
+      }));
+  
+      setCategories(normalized);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchCategories();
@@ -31,11 +39,16 @@ const Categories: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
     if (editingCategory) {
+      console.log("EDITING CATEGORY:", editingCategory);
       await ecommerceService.updateCategory(editingCategory.id, formData);
     } else {
-      await ecommerceService.createCategory(formData);
+      await ecommerceService.createCategory(
+        { name: formData.name }
+      );
     }
+  
     setIsModalOpen(false);
     fetchCategories();
   };
@@ -43,7 +56,6 @@ const Categories: React.FC = () => {
   const columns = [
     { header: 'ID', accessor: 'id' as keyof Category },
     { header: 'Nombre', accessor: 'name' as keyof Category },
-    { header: 'Descripción', accessor: 'description' as keyof Category },
   ];
 
   return (
@@ -69,6 +81,7 @@ const Categories: React.FC = () => {
         columns={columns} 
         data={categories} 
         onEdit={(cat) => {
+          console.log("ROW CLICKED:", cat);
           const item = cat as Category;
           setEditingCategory(item);
           setFormData({ name: item.name, description: item.description });
@@ -96,14 +109,6 @@ const Categories: React.FC = () => {
               className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20"
               value={formData.name}
               onChange={e => setFormData({...formData, name: e.target.value})}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
-            <textarea 
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none h-24"
-              value={formData.description}
-              onChange={e => setFormData({...formData, description: e.target.value})}
             />
           </div>
           <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg font-bold">

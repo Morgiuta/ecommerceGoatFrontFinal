@@ -9,7 +9,10 @@ import { CartProvider } from './context/CartContext';
 import Catalog from './pages/shop/Catalog';
 import Checkout from './pages/shop/Checkout';
 import Login from './pages/shop/Login'; // Necesitarás este
-
+import Register from './pages/shop/Register';
+import Profile from './pages/shop/Profile';
+import EditProfile from './pages/shop/EditProfile';
+import ProductDetail from './pages/shop/ProductDetail';
 // Admin Pages
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
@@ -37,6 +40,10 @@ const App: React.FC = () => {
             <Route path="/cart" element={<Checkout />} /> {/* O una página dedicada de Cart */}
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register/>} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/edit" element={<EditProfile />} />
+            <Route path="/productDetail/:id" element={<ProductDetail />} />
           </Routes>
         </PublicLayout>
       )}

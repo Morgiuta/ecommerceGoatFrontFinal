@@ -4,6 +4,8 @@ import { ecommerceService } from '../../services/ecommerceService';
 import { Product, Category } from '../../types';
 import { useCart } from '../../context/CartContext';
 import { Plus, ShoppingBag, Star, LayoutGrid, List } from 'lucide-react';
+import { Link } from "react-router-dom";
+
 
 const Catalog: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -19,8 +21,14 @@ const Catalog: React.FC = () => {
           ecommerceService.getProducts(),
           ecommerceService.getCategories()
         ]);
-        setProducts(prodRes.data);
+  
+        const productosDisponibles = prodRes.data.filter(
+          p => Number(p.stock) > 0
+        );
+  
+        setProducts(productosDisponibles);
         setCategories(catRes.data);
+  
       } catch (err) {
         console.error(err);
       } finally {
@@ -80,46 +88,61 @@ const Catalog: React.FC = () => {
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {filtered.map(product => (
-          /* Fixed: accessing product.id instead of non-existent product.id_key */
           <div key={product.id} className="group bg-white rounded-3xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500">
-            <div className="aspect-square bg-slate-50 relative overflow-hidden">
-               <img 
-                src={product.image_url || `https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=400`} 
-                alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-               />
-               {product.stock < 10 && (
-                 <span className="absolute top-4 left-4 bg-rose-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">
-                  Últimas {product.stock} u.
-                 </span>
-               )}
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div className="space-y-1">
-                <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">{product.category?.name}</p>
-                <h3 className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-1">{product.name}</h3>
+            
+            <Link to={`/productDetail/${product.id}`} className="block">
+              <div className="aspect-square bg-slate-50 relative overflow-hidden">
+                <img 
+                  src={product.image_url || `https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=400`} 
+                  alt={product.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                {product.stock < 10 && (
+                  <span className="absolute top-4 left-4 bg-rose-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase">
+                    Últimas {product.stock} u.
+                  </span>
+                )}
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-black text-slate-900">${product.price.toFixed(2)}</p>
-                  <div className="flex items-center text-amber-400">
-                    <Star size={12} fill="currentColor" />
-                    <Star size={12} fill="currentColor" />
-                    <Star size={12} fill="currentColor" />
-                    <Star size={12} fill="currentColor" />
-                    <span className="text-[10px] text-slate-400 font-bold ml-1">(12)</span>
+              <div className="p-6 space-y-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
+                    {product.category?.name}
+                  </p>
+                  <h3 className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors line-clamp-1">
+                    {product.name}
+                  </h3>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-2xl font-black text-slate-900">
+                      ${product.price.toFixed(2)}
+                    </p>
+                    <div className="flex items-center text-amber-400">
+                      <Star size={12} fill="currentColor" />
+                      <Star size={12} fill="currentColor" />
+                      <Star size={12} fill="currentColor" />
+                      <Star size={12} fill="currentColor" />
+                      <span className="text-[10px] text-slate-400 font-bold ml-1">
+                        (12)
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <button 
-                  onClick={() => addToCart(product)}
-                  className="bg-slate-900 text-white p-3 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 active:scale-90"
-                >
-                  <Plus size={20} />
-                </button>
               </div>
+            </Link>
+
+            {/* Botón queda afuera para que no redirija */}
+            <div className="px-6 pb-6">
+              <button 
+                onClick={() => addToCart(product)}
+                className="bg-slate-900 text-white p-3 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 active:scale-90"
+              >
+                <Plus size={20} />
+              </button>
             </div>
+
           </div>
         ))}
       </div>

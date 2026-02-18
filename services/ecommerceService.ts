@@ -1,5 +1,6 @@
 
-import api from './api';
+import api, { apiRoot } from './api';
+
 import { 
   Client, Product, Category, Order, 
   Address, Bill, Review, HealthStatus, OrderDetail
@@ -81,10 +82,6 @@ export const ecommerceService = {
 
   // Health check - Consistente con 127.0.0.1
   // getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
-  getHealth: () => api.get<HealthStatus>('health_check/', {
-    baseURL: 'https://ecommercegoatbackfinal.onrender.com/'
-  }),
-  
-
+  getHealth: () => apiRoot.get<HealthStatus>('health_check/'),
 
 };

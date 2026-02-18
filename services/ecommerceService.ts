@@ -80,5 +80,8 @@ export const ecommerceService = {
   addToCart: (clientId: number, item: any) => api.post(`cart/${clientId}/items`, item),
 
   // Health check - Consistente con 127.0.0.1
-  getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
+  // getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
+  getHealth: () => api.get<HealthStatus>('/health_check/'),
+
+
 };

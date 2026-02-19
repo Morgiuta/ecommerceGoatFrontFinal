@@ -12,13 +12,17 @@ const Products: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: 0,
     stock: 0,
-    category_id: 0
+    category_id: 0,
+    image_url: ''
   });
 
   const fetchData = async () => {
@@ -29,6 +33,9 @@ const Products: React.FC = () => {
         ecommerceService.getCategories()
       ]);
       console.log("PRODUCTS BACK:", prodRes.data);
+      console.log("PRODUCTS RAW:", prodRes.data);
+      console.log("IMAGE CHECK:", prodRes.data.map(p => p.image_url));
+
       setProducts(prodRes.data);
       setCategories(catRes.data);
     } catch (error) {
@@ -49,7 +56,8 @@ const Products: React.FC = () => {
       description: product.description,
       price: product.price,
       stock: product.stock,
-      category_id: product.category_id
+      category_id: product.category_id,
+      image_url: product.image_url || ''
     });
     setIsModalOpen(true);
   };
@@ -63,16 +71,92 @@ const Products: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingProduct) {
-      await ecommerceService.updateProduct(editingProduct.id, formData);
-    } else {
-      await ecommerceService.createProduct({ ...formData, active: true });
+  
+    if (formData.price <= 0) {
+      alert('El precio debe ser mayor a 0');
+      return;
     }
-    setIsModalOpen(false);
-    fetchData();
+  
+    if (formData.stock <= 0) {
+      alert('El stock debe ser mayor a 0');
+      return;
+    }
+  
+    setUploadingImage(true);
+  
+    try {
+      let finalImageUrl = formData.image_url;
+  
+      if (imageFile) {
+        finalImageUrl = await uploadImageToCloudinary();
+      }
+  
+      const payload = {
+        ...formData,
+        image_url: finalImageUrl
+      };
+  
+      if (editingProduct) {
+        await ecommerceService.updateProduct(editingProduct.id, payload);
+      } else {
+        await ecommerceService.createProduct({ ...payload, active: true });
+      }
+  
+      setIsModalOpen(false);
+      setImageFile(null);
+      fetchData();
+  
+    } catch (err) {
+      console.error(err);
+      alert("Error al guardar producto");
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
+  const uploadImageToCloudinary = async () => {
+    if (!imageFile) return null;
+  
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+  
+    const data = new FormData();
+    data.append("file", imageFile);
+    data.append("upload_preset", uploadPreset);
+  
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      {
+        method: "POST",
+        body: data
+      }
+    );
+  
+    const file = await res.json();
+  
+    if (!res.ok) {
+      throw new Error(file.error?.message || "Error subiendo imagen");
+    }
+  
+    return file.secure_url;
+  };
+  
+
   const columns = [
+    {
+      header: 'Imagen',
+      accessor: (item: Product) => (
+        item.image_url ? (
+          <img
+            src={item.image_url}
+            alt={item.name}
+            className="h-12 w-12 object-contain rounded border"
+          />
+        ) : (
+          <span className="text-gray-400">📷</span>
+        )
+      )
+    },
     { header: 'Nombre', accessor: 'name' as keyof Product },
     { 
       header: 'Categoría', 
@@ -154,6 +238,7 @@ const Products: React.FC = () => {
               <input 
                 type="number"
                 step="0.01"
+                min="0.01"
                 required
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none"
                 value={formData.price}
@@ -164,20 +249,53 @@ const Products: React.FC = () => {
               <label className="block text-sm font-medium text-slate-700 mb-1">Stock</label>
               <input 
                 type="number"
+                min="1"
                 required
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none"
                 value={formData.stock}
                 onChange={e => setFormData({...formData, stock: parseInt(e.target.value)})}
               />
             </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
-            <textarea 
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none h-24"
-              value={formData.description}
-              onChange={e => setFormData({...formData, description: e.target.value})}
+            <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Imagen del Producto
+            </label>
+
+            <input 
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files) {
+                  setImageFile(e.target.files[0]);
+                }
+              }}
+              className="w-full border p-2 rounded-lg bg-white text-sm cursor-pointer"
             />
+
+            {/* Imagen actual (cuando edita y no seleccionó nueva) */}
+            {editingProduct && formData.image_url && !imageFile && (
+              <div className="mt-3">
+                <p className="text-xs text-slate-500 mb-1">Imagen actual:</p>
+                <img
+                  src={formData.image_url}
+                  alt="Actual"
+                  className="h-24 object-contain border rounded-lg p-1"
+                />
+              </div>
+            )}
+
+            {/* Preview nueva imagen seleccionada */}
+            {imageFile && (
+              <div className="mt-3">
+                <p className="text-xs text-slate-500 mb-1">Vista previa:</p>
+                <img
+                  src={URL.createObjectURL(imageFile)}
+                  alt="Preview"
+                  className="h-24 object-contain border rounded-lg p-1"
+                />
+              </div>
+            )}
+          </div>
           </div>
           <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg font-bold mt-2">
             Guardar Cambios

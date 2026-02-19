@@ -10,13 +10,13 @@ const api = axios.create({
   },
 });
 
-/*export const apiRoot = axios.create({
+export const apiRoot = axios.create({
    baseURL: 'https://ecommercegoatbackfinal.onrender.com/',
    headers: {
      'Content-Type': 'application/json',
    },
  });
-*/
+
 
 api.interceptors.response.use(
   (response) => response,

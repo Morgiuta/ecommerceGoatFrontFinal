@@ -1,5 +1,5 @@
 
-import api, { apiRoot } from './api';
+import api ,{ apiRoot } from './api';
 
 import { 
   Client, Product, Category, Order, 
@@ -23,14 +23,17 @@ export const ecommerceService = {
     return {
       ...res,
       data: res.data.map((p: any) => ({
-        id: p.id_key,
+        id: p.id_key,                // lo transformamos para el frontend
+        id_key: p.id_key,            // lo dejamos también si querés compatibilidad
         name: p.name,
         description: p.description ?? '',
         price: p.price,
         stock: p.stock,
+        image_url: p.image_url ?? '',
         category_id: p.category_id,
-        category: p.category,
-        active: p.active
+        active: p.active,
+        category: p.category ?? null,
+        reviews: p.reviews ?? []
       }))
     };
   },

@@ -13,6 +13,7 @@ import Register from './pages/shop/Register';
 import Profile from './pages/shop/Profile';
 import EditProfile from './pages/shop/EditProfile';
 import ProductDetail from './pages/shop/ProductDetail';
+import SearchResults from './pages/shop/SerachResults';
 // Admin Pages
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
@@ -44,6 +45,7 @@ const App: React.FC = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/edit" element={<EditProfile />} />
             <Route path="/productDetail/:id" element={<ProductDetail />} />
+            <Route path="/search" element={<SearchResults />} />
           </Routes>
         </PublicLayout>
       )}

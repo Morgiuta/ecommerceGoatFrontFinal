@@ -1,5 +1,6 @@
-
 import api ,{ apiRoot } from './api';
+//import api from './api';
+//import { apiRoot } from './api';
 
 import { 
   Client, Product, Category, Order, 
@@ -41,7 +42,48 @@ export const ecommerceService = {
   createProduct: (data: any) => api.post('products/', data),
   updateProduct: (id: number, data: any) => api.put(`products/id/${id}`, data),
   deleteProduct: (id: number) => api.delete(`products/id/${id}`),
-
+  async getFilteredProducts(filters: {
+    search?: string;
+    category_id?: number;
+    min_price?: number;
+    max_price?: number;
+    in_stock_only?: boolean;
+    active?: boolean;
+    sort_by?: string;
+    skip?: number;
+    limit?: number;
+  }) {
+  
+    const params = new URLSearchParams();
+  
+    if (filters.search) params.append("search", filters.search);
+    if (filters.category_id) params.append("category_id", filters.category_id.toString());
+    if (filters.min_price !== undefined) params.append("min_price", filters.min_price.toString());
+    if (filters.max_price !== undefined) params.append("max_price", filters.max_price.toString());
+    if (filters.in_stock_only !== undefined) params.append("in_stock_only", filters.in_stock_only.toString());
+    if (filters.active !== undefined) params.append("active", filters.active.toString());
+    if (filters.sort_by) params.append("sort_by", filters.sort_by);
+    if (filters.skip !== undefined) params.append("skip", filters.skip.toString());
+    if (filters.limit !== undefined) params.append("limit", filters.limit.toString());
+  
+    const res = await api.get(`/products/filter?${params.toString()}`);
+  
+    return {
+      ...res,
+      data: res.data.map((p: any) => ({
+        id: p.id_key,
+        name: p.name,
+        description: p.description ?? '',
+        price: p.price,
+        stock: p.stock,
+        image_url: p.image_url,
+        category_id: p.category_id,
+        category: p.category,
+        active: p.active
+      }))
+    };
+  },
+  
   // Categories
   async getCategories() {
     const res = await api.get('/categories');
@@ -84,7 +126,7 @@ export const ecommerceService = {
   addToCart: (clientId: number, item: any) => api.post(`cart/${clientId}/items`, item),
 
   // Health check - Consistente con 127.0.0.1
-  // getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
+  //getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
   getHealth: () => apiRoot.get<HealthStatus>('health_check/'),
 
 };

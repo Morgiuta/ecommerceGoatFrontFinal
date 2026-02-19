@@ -3,8 +3,8 @@ import axios from 'axios';
 
 const api = axios.create({
   // Usamos 127.0.0.1 en lugar de localhost para evitar demoras/errores de IPv6 (::1)
-  // baseURL: 'http://127.0.0.0:8000/api/v1/',
-   baseURL: 'https://ecommercegoatbackfinal.onrender.com/api/v1/',
+  //baseURL: 'http://127.0.0.0:8000/api/v1/',
+  baseURL: 'https://ecommercegoatbackfinal.onrender.com/api/v1/',
   headers: {
     'Content-Type': 'application/json',
   },

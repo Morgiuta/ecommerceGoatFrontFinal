@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, User, LogOut, Package, Search } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
@@ -9,6 +9,18 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const navigate = useNavigate();
   const userStr = localStorage.getItem('vortex_user');
   const user = userStr ? JSON.parse(userStr) : null;
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const location = useLocation();
+
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q');
+  
+    if (q) {
+      setSearchTerm(q);
+    }
+  }, [location.search]);
 
   const handleLogout = () => {
     localStorage.removeItem('vortex_user');
@@ -23,16 +35,21 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
           <Link to="/" className="text-2xl font-black text-indigo-600 tracking-tighter shrink-0">
             VORTEX<span className="text-slate-900">STORE</span>
           </Link>
-
           <div className="hidden md:flex flex-1 max-w-md relative">
              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
              <input 
               type="text" 
               placeholder="¿Qué buscas hoy?" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchTerm.trim() !== '') {
+                  navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+                }
+              }}
               className="w-full pl-10 pr-4 py-2 bg-slate-100 rounded-full border-none focus:ring-2 focus:ring-indigo-500/20 text-sm transition-all"
-             />
+            />
           </div>
-
           <div className="flex items-center space-x-5">
             <Link to="/cart" className="relative p-2 text-slate-600 hover:text-indigo-600 transition-colors">
               <ShoppingCart size={24} />

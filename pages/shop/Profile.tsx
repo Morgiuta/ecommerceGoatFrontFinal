@@ -93,6 +93,31 @@ const Profile: React.FC = () => {
     }
   };
 
+  const handleDeactivateAccount = async () => {
+    const confirmDelete = window.confirm(
+      "¿Estás seguro que querés desactivar tu cuenta? Esta acción es irreversible."
+    );
+  
+    if (!confirmDelete) return;
+  
+    try {
+      await ecommerceService.deleteClient(Number(customerId));
+  
+      // Limpiar sesión
+      localStorage.removeItem("vortex_user");
+  
+      alert("Tu cuenta fue desactivada correctamente.");
+  
+      navigate("/");
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        alert("El usuario no existe.");
+      } else {
+        alert("Error al desactivar la cuenta.");
+      }
+    }
+  };
+
   if (loading) return <div className="py-20 text-center">Cargando perfil...</div>;
 
   return (
@@ -127,6 +152,13 @@ const Profile: React.FC = () => {
         >
           <LogOut size={20} />
           <span>Cerrar Sesión</span>
+        </button>
+        <button 
+          onClick={handleDeactivateAccount}
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition-all shadow-md"
+        >
+          <User size={20} />
+          <span>Desactivar Cuenta</span>
         </button>
       </div>
   

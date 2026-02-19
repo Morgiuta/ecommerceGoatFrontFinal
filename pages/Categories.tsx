@@ -18,13 +18,13 @@ const Categories: React.FC = () => {
     try {
       const res = await ecommerceService.getCategories();
   
-      const normalized = res.data.map((cat: any) => ({
-        id: cat.id_key,
+      /*const normalized = res.data.map((cat: any) => ({
+        id: cat.id,
         name: cat.name,
-        description: cat.description ?? '' // porque no viene del backend
-      }));
+        description: cat.description ?? ''
+      }));*/
   
-      setCategories(normalized);
+      setCategories(res.data);
     } catch (err) {
       console.error(err);
     } finally {

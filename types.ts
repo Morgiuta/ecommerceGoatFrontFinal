@@ -40,8 +40,8 @@ export interface Product {
 
 export interface Client {
   id: number;
-  first_name: string;
-  last_name: string;
+  name: string;
+  lastname: string;
   email: string;
   phone: string;
   is_admin: boolean;
@@ -72,6 +72,7 @@ export interface Bill {
   bill_date: string;
   amount: number;
   tax: number;
+  client?: Client
 }
 
 export interface Order {

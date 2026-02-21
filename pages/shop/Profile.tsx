@@ -19,6 +19,8 @@ const Profile: React.FC = () => {
     city: ""
   });
   //const [addingAddress, setAddingAddress] = useState(false);
+  const [showOrders, setShowOrders] = useState(true);
+  const [showBills, setShowBills] = useState(true);
 
 
   useEffect(() => {
@@ -45,14 +47,23 @@ const Profile: React.FC = () => {
   
         setAddresses(userAddresses);
   
-        const userOrders = orderRes.data;
+        const userOrders = orderRes.data.sort(
+          (a: Order, b: Order) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        
         setOrders(userOrders);
   
         const userBills = billRes.data.filter(bill =>
           userOrders.some(order => order.id === bill.order_id)
         );
   
-        setBills(userBills);
+        const orderedBills = userBills.sort(
+          (a: Bill, b: Bill) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        
+        setBills(orderedBills);
   
       } catch (err) {
         console.error(err);
@@ -167,7 +178,10 @@ const Profile: React.FC = () => {
         
         {/* Mis Pedidos */}
         <div className="space-y-6">
-          <div className="flex items-center justify-between px-2">
+          <div
+            onClick={() => setShowOrders(prev => !prev)}
+            className="flex items-center justify-between px-2 cursor-pointer select-none"
+          >
             <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
               <Package size={24} className="text-blue-600" />
               Mis Pedidos
@@ -176,73 +190,148 @@ const Profile: React.FC = () => {
               {orders.length} pedidos
             </span>
           </div>
-          
-          <div className="space-y-4">
-            {orders.map(order => (
-              <div key={order.id} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all group">
-                <div className="flex justify-between items-center">
-                  <div className="space-y-1">
-                    <p className="font-black text-slate-900">Pedido #{order.id}</p>
-                    <div className="flex items-center text-xs text-slate-400 font-bold gap-2">
-                      <Clock size={12} />
-                      {order.date}
+
+          {showOrders && (
+            <div className="space-y-4">
+
+              {orders.length === 0 ? (
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 text-slate-500 text-sm">
+                  No tienes pedidos aún.
+                </div>
+              ) : (
+                (() => {
+                  const order = orders[0];
+                  const formattedDate = new Date(order.date).toLocaleDateString();
+
+                  return (
+                    <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all group">
+                      <div className="flex justify-between items-center">
+                        <div className="space-y-1">
+                          <p className="font-black text-slate-900">
+                            Pedido #{order.id_key}
+                          </p>
+                          <div className="flex items-center text-xs text-slate-400 font-bold gap-2">
+                            <Clock size={12} />
+                            {formattedDate}
+                          </div>
+                        </div>
+
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                          order.status === Status.DELIVERED
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          {Status[order.status]}
+                        </span>
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t flex justify-between items-end">
+                        <div>
+                          <p className="text-xs text-slate-400 font-bold uppercase mb-1">
+                            Total pagado
+                          </p>
+                          <p className="text-2xl font-black text-slate-900">
+                            ${Number(order.total || 0).toFixed(2)}
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={() => navigate(`/orders/${order.id_key}`)}
+                          className="p-2 text-slate-400 group-hover:text-blue-600 transition-colors"
+                        >
+                          <ChevronRight size={24} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
-                    order.status === Status.DELIVERED ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                  }`}>
-                    {Status[order.status]}
-                  </span>
-                </div>
-                
-                <div className="mt-4 pt-4 border-t flex justify-between items-end">
-                  <div>
-                    <p className="text-xs text-slate-400 font-bold uppercase mb-1">Total pagado</p>
-                    <p className="text-2xl font-black text-slate-900">${order.total.toFixed(2)}</p>
-                  </div>
-                  <button className="p-2 text-slate-400 group-hover:text-blue-600 transition-colors">
-                    <ChevronRight size={24} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+                  );
+                })()
+              )}
+
+              {orders.length > 1 && (
+                <button
+                  onClick={() => navigate('/orders')}
+                  className="w-full text-sm font-bold text-blue-600 hover:underline"
+                >
+                  Ver todos los pedidos →
+                </button>
+              )}
+
+            </div>
+          )}
         </div>
-  
+
         {/* Mis Facturas */}
         <div className="space-y-6">
-          <div className="flex items-center justify-between px-2">
+          <div
+            onClick={() => setShowBills(prev => !prev)}
+            className="flex items-center justify-between px-2 cursor-pointer select-none"
+          >
             <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
               <FileText size={24} className="text-blue-600" />
               Facturas & Documentos
             </h3>
           </div>
-  
-          <div className="space-y-4">
-            {bills.map(bill => (
-              <div key={bill.id} className="bg-white p-6 rounded-3xl border border-slate-100 flex items-center justify-between hover:shadow-lg transition-all cursor-pointer">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400">
-                    <FileText size={24} />
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-900">Factura #{bill.id}</p>
-                    <p className="text-xs text-slate-400 font-medium">
-                      Pedido #{bill.order_id} · {bill.bill_date}
-                    </p>
-                  </div>
+
+          {showBills && (
+            <div className="space-y-4">
+
+              {bills.length === 0 ? (
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 text-slate-500 text-sm">
+                  No tienes facturas aún.
                 </div>
-                <div className="text-right">
-                  <p className="font-black text-slate-900">${bill.amount.toFixed(2)}</p>
-                  <button className="text-xs font-bold text-blue-600 hover:underline">
-                    Descargar PDF
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ) : (
+                (() => {
+                  const bill = bills[0];
+                  const formattedDate = new Date(bill.date).toLocaleDateString();
+
+                  return (
+                    <div
+                      key={bill.id_key}
+                      className="bg-white p-6 rounded-3xl border border-slate-100 flex items-center justify-between hover:shadow-lg transition-all cursor-pointer"
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400">
+                          <FileText size={24} />
+                        </div>
+
+                        <div>
+                          <p className="font-bold text-slate-900">
+                            Factura #{bill.id_key}
+                          </p>
+                          <p className="text-xs text-slate-400 font-medium">
+                            Pedido #{bill.order_id} · {formattedDate}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <p className="font-black text-slate-900">
+                          ${Number(bill.total || 0).toFixed(2)}
+                        </p>
+
+                        <button className="text-xs font-bold text-blue-600 hover:underline">
+                          Descargar PDF
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()
+              )}
+
+              {/* 🔥 BOTÓN VER TODAS */}
+              {bills.length > 1 && (
+                <button
+                  onClick={() => navigate('/bills')}
+                  className="w-full text-sm font-bold text-blue-600 hover:underline"
+                >
+                  Ver todas las facturas →
+                </button>
+              )}
+
+            </div>
+          )}
         </div>
-  
+
       </div>
   
       {/* SEGUNDA FILA: Direcciones */}

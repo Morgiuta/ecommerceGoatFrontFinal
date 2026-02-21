@@ -36,14 +36,28 @@ const Cart: React.FC = () => {
         <div className="lg:col-span-2 space-y-4">
           {cart.map(item => (
             <div key={item.product.id} className="bg-white p-6 rounded-3xl border border-slate-100 flex items-center gap-6 shadow-sm group">
-              <div className="w-24 h-24 bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 flex-shrink-0">
-                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt={item.product.name} />
-              </div>
+
+              <Link to={`/products/${item.product.id}`} className="w-24 h-24 bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 flex-shrink-0 block">
+                <img 
+                  src={item.product.image_url || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=200"} 
+                  className="w-full h-full object-cover" 
+                  alt={item.product.name} 
+                />
+              </Link>
               
               <div className="flex-1 space-y-2">
                 <div className="flex justify-between items-start">
-                  <h4 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{item.product.name}</h4>
-                  <button onClick={() => removeFromCart(item.product.id)} className="text-slate-300 hover:text-red-500 transition-colors">
+                  <Link 
+                    to={`/products/${item.product.id}`}
+                    className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors"
+                  >
+                    {item.product.name}
+                  </Link>
+
+                  <button 
+                    onClick={() => removeFromCart(item.product.id)} 
+                    className="text-slate-300 hover:text-red-500 transition-colors"
+                  >
                     <Trash2 size={20} />
                   </button>
                 </div>

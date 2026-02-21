@@ -13,7 +13,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
     { label: 'Productos', icon: Package, path: '/admin/products' },
     { label: 'Categorías', icon: Tags, path: '/admin/categories' },
-    { label: 'Clientes', icon: Users, path: '/admin/clients' },
     { label: 'Pedidos', icon: ShoppingCart, path: '/admin/orders' },
     { label: 'Facturación', icon: Receipt, path: '/admin/bills' },
   ];

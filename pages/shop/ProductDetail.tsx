@@ -13,39 +13,80 @@ const ProductDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const { addToCart } = useCart();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
       if (!id) return;
       setLoading(true);
+  
       try {
         const [prodRes, revRes] = await Promise.all([
-          ecommerceService.getProducts(), // Simulating getById for this demo
+          ecommerceService.getProducts(),
           ecommerceService.getReviews()
         ]);
-        const found = prodRes.data.find(p => p.id === parseInt(id));
+  
+        const found = prodRes.data.find(
+          p => Number(p.id) === Number(id)
+        );
+  
         setProduct(found || null);
-        setReviews(revRes.data.filter(r => r.product_id === parseInt(id) && r.status === 'approved'));
+  
+        const filteredReviews = revRes.data.filter(
+          r => Number(r.product_id) === Number(id)
+        );
+  
+        setReviews(filteredReviews);
+  
+        if (found) {
+          setSelectedImage(
+            found.image_url ||
+            'https://images.unsplash.com/photo-1523275335684-37898b6baf30'
+          );
+        }
+  
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
       }
     };
+  
     fetchProduct();
   }, [id]);
 
   const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!product) return;
+  
     try {
-      // Logic for adding review to API would go here
+      await ecommerceService.createReview({
+        product_id: product.id,
+        rating: newReview.rating,
+        comment: newReview.comment
+      });
+  
       alert("Reseña enviada para moderación.");
+  
       setNewReview({ rating: 5, comment: '' });
+  
     } catch (err) {
+      console.error(err);
       alert("Error al enviar reseña.");
     }
+
+    const revRes = await ecommerceService.getReviews();
+    setReviews(
+      revRes.data.filter(
+        r => r.product_id === product.id && r.status === 'approved'
+      )
+    );
   };
+
+  const averageRating =
+  reviews.length > 0
+    ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+    : 0;
 
   if (loading) return <div className="py-20 text-center">Cargando detalles...</div>;
   if (!product) return <div className="py-20 text-center text-red-500">Producto no encontrado.</div>;
@@ -62,18 +103,30 @@ const ProductDetail: React.FC = () => {
         <div className="space-y-4">
           <div className="aspect-square rounded-[2rem] overflow-hidden bg-slate-100 border border-slate-200">
             <img 
-              src={`https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800`} 
+              src={selectedImage || product.image_url}
               className="w-full h-full object-cover"
               alt={product.name}
             />
           </div>
-          <div className="grid grid-cols-4 gap-4">
-            {[1,2,3,4].map(i => (
-              <div key={i} className="aspect-square rounded-xl bg-slate-100 overflow-hidden opacity-50 hover:opacity-100 cursor-pointer transition-opacity border">
-                <img src={`https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=200`} alt="thumb" />
-              </div>
-            ))}
-          </div>
+
+          {/* Si en el futuro soportamos múltiples imágenes */}
+          {product.images && product.images.length > 0 && (
+            <div className="grid grid-cols-4 gap-4">
+              {product.images.map((img: string, index: number) => (
+                <div 
+                  key={index}
+                  onClick={() => setSelectedImage(img)}
+                  className={`aspect-square rounded-xl overflow-hidden cursor-pointer border transition-all ${
+                    selectedImage === img
+                      ? "border-blue-600"
+                      : "border-slate-200 opacity-60 hover:opacity-100"
+                  }`}
+                >
+                  <img src={img} alt="thumb" />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Info */}
@@ -87,7 +140,13 @@ const ProductDetail: React.FC = () => {
             </h1>
             <div className="flex items-center space-x-4">
               <div className="flex text-amber-400">
-                {[1,2,3,4,5].map(i => <Star key={i} size={18} fill={i <= 4 ? "currentColor" : "none"} />)}
+                {[1,2,3,4,5].map(i => (
+                  <Star
+                    key={i}
+                    size={18}
+                    fill={i <= Math.round(averageRating) ? "currentColor" : "none"}
+                  />
+                ))}
               </div>
               <span className="text-sm text-slate-500 font-medium">({reviews.length} reseñas verificadas)</span>
             </div>
@@ -110,9 +169,6 @@ const ProductDetail: React.FC = () => {
                >
                 <ShoppingCart size={20} />
                 <span>Añadir al Carrito</span>
-              </button>
-              <button className="flex-1 bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all">
-                Comprar Ahora
               </button>
             </div>
           </div>
@@ -146,10 +202,15 @@ const ProductDetail: React.FC = () => {
                   <div>
                     <p className="font-bold text-slate-800">{rev.user_name}</p>
                     <div className="flex text-amber-400 mt-1">
-                      {[1,2,3,4,5].map(i => <Star key={i} size={14} fill={i <= rev.rating ? "currentColor" : "none"} />)}
+                      {[1,2,3,4,5].map(i => (
+                        <Star
+                          key={i}
+                          size={14}
+                          fill={i <= rev.rating ? "currentColor" : "none"}
+                        />
+                      ))}
                     </div>
-                  </div>
-                  <span className="text-xs text-slate-400 font-medium">Hace 2 días</span>
+                  </div>              
                 </div>
                 <p className="text-slate-600 text-sm italic">"{rev.comment}"</p>
               </div>

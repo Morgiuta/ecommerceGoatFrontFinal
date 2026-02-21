@@ -1,4 +1,5 @@
-import api ,{ apiRoot } from './api';
+
+import api, {apiRoot} from './api';
 //import api from './api';
 //import { apiRoot } from './api';
 
@@ -83,6 +84,26 @@ export const ecommerceService = {
       }))
     };
   },
+
+  async getProductById(id: number) {
+    const res = await api.get(`/products/id/${id}`);
+  
+    return {
+      ...res,
+      data: {
+        id: res.data.id_key,
+        name: res.data.name,
+        description: res.data.description ?? '',
+        price: res.data.price,
+        stock: res.data.stock,
+        image_url: res.data.image_url,
+        category_id: res.data.category_id,
+        active: res.data.active,
+        category: res.data.category,
+        reviews: res.data.reviews ?? []
+      }
+    };
+  },
   
   // Categories
   async getCategories() {
@@ -106,10 +127,25 @@ export const ecommerceService = {
   createOrder: (data: any) => api.post('orders/', data),
   updateOrderStatus: (id: number, status: number) => api.patch(`orders/id/${id}/status`, { status }),
   createOrderDetail: (data: any) => api.post('order_details/', data),
+  async getOrderDetails() {
+    return await api.get('/order_details');
+  },
+  async getOrderById(id: number) {
+    return await api.get(`/orders/id/${id}`);
+  },
+
+  async cancelOrder(orderId: number) {
+    return api.patch(`/orders/id/${orderId}/status`, {
+      status: 4
+    });
+  },
 
   // Bills
   getBills: () => api.get<Bill[]>('bills/'),
   createBill: (data: any) => api.post('bills/', data),
+  async getBillById(id: number) {
+    return await api.get(`/bills/id/${id}`);
+  },
 
   // Addresses
   getAddresses: () => api.get<Address[]>('addresses/'),
@@ -120,12 +156,45 @@ export const ecommerceService = {
   // Reviews
   getReviews: () => api.get<Review[]>('reviews/'),
   updateReviewStatus: (id: number, status: string) => api.patch(`reviews/id/${id}/status`, { status }),
+  async createReview(data: {
+    rating: number;
+    comment: string;
+    product_id: number;
+  }) {
+    return await api.post('/reviews', {
+      rating: data.rating,
+      comment: data.comment,
+      product_id: data.product_id
+    });
+  },
+  /// =========================
+  // CART (Backend)
+  // =========================
 
-  // Cart (Backend-side)
-  getCart: (clientId: number) => api.get(`cart/${clientId}`),
-  addToCart: (clientId: number, item: any) => api.post(`cart/${clientId}/items`, item),
+  getCart: (clientId: number) =>
+    api.get(`/cart/${clientId}`),
+
+  clearCart: (clientId: number) =>
+    api.delete(`/cart/${clientId}`),
+
+  addToCart: (clientId: number, productId: number, quantity: number) =>
+    api.post(`/cart/${clientId}/items`, {
+      product_id: productId,
+      quantity
+    }),
+
+  updateCartItem: (clientId: number, productId: number, quantity: number) =>
+    api.put(`/cart/${clientId}/items`, {
+      product_id: productId,
+      quantity
+    }),
+
+  removeCartItem: (clientId: number, productId: number) =>
+    api.delete(`/cart/${clientId}/items/${productId}`),
 
   // Health check - Consistente con 127.0.0.1
+  //getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
+  getHealth: () => apiRoot.get<HealthStatus>('health_check/'),
   //getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
   getHealth: () => apiRoot.get<HealthStatus>('health_check/'),
 

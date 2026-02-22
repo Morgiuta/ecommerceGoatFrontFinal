@@ -159,7 +159,6 @@ const ProductDetail: React.FC = () => {
           <div className="space-y-6">
             <div className="flex items-baseline space-x-2">
               <span className="text-5xl font-black text-blue-600">${product.price.toFixed(2)}</span>
-              <span className="text-slate-400 line-through text-lg font-medium">${(product.price * 1.2).toFixed(2)}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

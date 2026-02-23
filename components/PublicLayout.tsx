@@ -3,6 +3,8 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, User, LogOut, Package, Search,ShoppingBag, Mail,MapPin,Phone,Facebook,Instagram,Twitter } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { motion } from "framer-motion";
+
 
 
 const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -30,7 +32,7 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   };
 
   return (
-<div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-200 to-slate-300 font-sans text-slate-900 flex flex-col transition-colors duration-500">
+<div className="min-h-screen bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 font-sans text-slate-900 flex flex-col transition-colors duration-500">
       <nav className="bg-white/70 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-50 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           <Link to="/" className="text-2xl font-black text-indigo-600 tracking-tighter shrink-0">
@@ -88,11 +90,23 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
-        {children}
-      </main>
+      <motion.main
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5, ease: "easeOut" }}
+  className="max-w-7xl mx-auto px-4 py-8 flex-1 w-full"
+>
+  {children}
+</motion.main>
 
-      <footer className="bg-slate-900 text-slate-300 rounded-t-[3rem] pt-16 pb-8 mt-20">
+
+      <motion.footer
+  initial={{ opacity: 0 }}
+  whileInView={{ opacity: 1 }}
+  transition={{ duration: 0.6 }}
+  className="bg-slate-900 text-slate-300 rounded-t-[3rem] pt-16 pb-8 mt-20"
+>
+
         <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-start gap-12">
   {/* Brand */}
   <div className="space-y-6">
@@ -147,7 +161,7 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-5" />
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Package, Search } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Package, Search,ShoppingBag, Mail,MapPin,Phone,Facebook,Instagram,Twitter } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -91,11 +91,63 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         {children}
       </main>
 
-      <footer className="bg-white border-t border-slate-200 py-12 mt-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-slate-400 text-sm font-medium">© 2024 Vortex Ecommerce System. Built with FastAPI & React.</p>
+      <footer className="bg-slate-900 text-slate-300 rounded-t-[3rem] pt-16 pb-8 mt-20">
+        <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-start gap-12">
+  {/* Brand */}
+  <div className="space-y-6">
+    <div className="flex items-center gap-2 text-white">
+      <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+        <ShoppingBag size={20} />
+      </div>
+      <span className="text-xl font-black tracking-tight">GOATECH</span>
+    </div>
+    <p className="text-sm leading-relaxed">
+      Líderes en tecnología y electrónica. Ofrecemos los mejores productos con garantía oficial y envío a todo el país.
+    </p>
+    <div className="flex gap-4">
+      <a href="https://facebook.com/" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all">
+        <Facebook size={18} />
+      </a>
+      <a href="https://instagram.com/" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all">
+        <Instagram size={18} />
+      </a>
+      <a href="https://x.com/" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all">
+        <Twitter size={18} />
+      </a>
+    </div>
+  </div>
+  {/* Contact */}
+  <div className="space-y-6">
+    <h4 className="text-white font-bold uppercase text-xs tracking-widest">Contacto</h4>
+    <ul className="space-y-4 text-sm">
+      <li className="flex items-start gap-3">
+        <MapPin size={18} className="text-indigo-500 shrink-0" />
+        <span>Av. Corrientes 1234, CABA, Argentina</span>
+      </li>
+      <li className="flex items-center gap-3">
+        <Phone size={18} className="text-indigo-500 shrink-0" />
+        <span>+54 11 4567-8900</span>
+      </li>
+      <li className="flex items-center gap-3">
+        <Mail size={18} className="text-indigo-500 shrink-0" />
+        <span>contacto@goatech.com</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+        <div className="max-w-7xl mx-auto px-8 mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-xs font-medium text-slate-500">
+            © 2024 Goatech Ecommerce System. Built with FastAPI & React.
+          </p>
+          <div className="flex gap-6 grayscale opacity-50">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-5" />
+          </div>
         </div>
       </footer>
+
     </div>
   );
 };

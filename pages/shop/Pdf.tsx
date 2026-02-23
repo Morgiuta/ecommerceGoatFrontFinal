@@ -1,36 +1,93 @@
 import jsPDF from "jspdf";
-
-export const generarPDF = (monto, fecha, nroPedido) => {
+import { Order } from "@/types";
+export const generarPDF = (order: Order) => {
   const doc = new jsPDF();
 
-  // 🧾 TÍTULO
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+    }).format(value);
+
+  // =========================
+  // HEADER
+  // =========================
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
   doc.text("FACTURA", 105, 20, { align: "center" });
 
-  // Línea separadora
-  doc.setLineWidth(0.5);
-  doc.line(20, 30, 190, 30);
-
-  // 🔹 Información
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
-
-  doc.text(`Pedido N°: ${nroPedido}`, 20, 50);
-  doc.text(`Fecha: ${fecha}`, 20, 60);
-
-  // 💰 Total destacado
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text(`Total: $${Number(monto).toFixed(2)}`, 20, 80);
-
-  // Caja alrededor del total
-  doc.rect(15, 70, 180, 20);
-
-  // Footer
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text("Gracias por su compra.", 105, 280, { align: "center" });
+  doc.text(`N° ${order.bill?.bill_number}`, 105, 28, { align: "center" });
 
-  doc.save(`Factura-${nroPedido}.pdf`);
+  doc.line(20, 35, 190, 35);
+
+  // =========================
+  // CLIENTE
+  // =========================
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("Cliente:", 20, 50);
+
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    `${order.client?.name} ${order.client?.lastname}`,
+    20,
+    58
+  );
+  doc.text(order.client?.email || "", 20, 66);
+
+  // =========================
+  // INFO FACTURA
+  // =========================
+  doc.text(`Fecha: ${order.bill?.date}`, 140, 58);
+  doc.text(`Pago: ${order.bill?.payment_type}`, 140, 66);
+
+  // =========================
+  // DETALLES PRODUCTOS
+  // =========================
+  let y = 95;
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Productos", 20, y);
+  y += 10;
+
+  doc.setFont("helvetica", "normal");
+
+  order.details?.forEach((detail) => {
+    const subtotal = detail.quantity * detail.price;
+
+    doc.text(detail.product?.name || "Producto", 20, y);
+    doc.text(`x${detail.quantity}`, 120, y);
+    doc.text(formatCurrency(subtotal), 160, y);
+
+    y += 8;
+  });
+
+  // =========================
+  // TOTALES
+  // =========================
+  y += 10;
+
+  doc.line(20, y, 190, y);
+  y += 10;
+
+  doc.setFont("helvetica", "bold");
+
+  doc.text(
+    `Total: ${formatCurrency(order.bill?.total || 0)}`,
+    140,
+    y
+  );
+
+  // =========================
+  // FOOTER
+  // =========================
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text("Gracias por su compra.", 105, 280, {
+    align: "center",
+  });
+
+  doc.save(`Factura-${order.bill?.bill_number}.pdf`);
 };

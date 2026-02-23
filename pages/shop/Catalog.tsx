@@ -57,13 +57,13 @@ const Catalog: React.FC = () => {
     ? products.filter((p) => p.category_id === activeCategory)
     : products;
 
-  if (loading)
+  /*if (loading)
     return (
       <div className="flex flex-col items-center justify-center h-96 space-y-4">
         <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
         <p className="font-bold text-slate-400">Preparando catálogo...</p>
       </div>
-    );
+    );*/
 
   const reviewCount = products.reviews?.length || 0;
 
@@ -108,72 +108,90 @@ const Catalog: React.FC = () => {
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {filtered.map((product) => {
-          const averageRating =
-            product.reviews && product.reviews.length > 0
-              ? product.reviews.reduce((acc, r) => acc + Number(r.rating), 0) /
-                product.reviews.length
-              : 0;
+        {loading ? (
+          <>
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-3xl border border-slate-100 p-6 animate-pulse space-y-4"
+              >
+                <div className="aspect-square bg-slate-200 rounded-2xl"></div>
+                <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+                <div className="h-3 bg-slate-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </>
+        ) : (
+          filtered.map((product) => {
+            const averageRating =
+              product.reviews && product.reviews.length > 0
+                ? product.reviews.reduce((acc, r) => acc + Number(r.rating), 0) /
+                  product.reviews.length
+                : 0;
 
-          const reviewCount = product.reviews?.length || 0;
+            const reviewCount = product.reviews?.length || 0;
 
-          console.log("⭐ DEBUG:", product.name, averageRating, reviewCount);
+            console.log("⭐ DEBUG:", product.name, averageRating, reviewCount);
 
-          return (
-            <div
-              key={product.id}
-              className="group bg-white rounded-3xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500"
-            >
-              <Link to={`/productDetail/${product.id}`} className="block">
-                <div className="aspect-square bg-slate-50 relative overflow-hidden">
-                  <img
-                    src={
-                      product.image_url ||
-                      `https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=400`
-                    }
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
+            return (
+              <div
+                key={product.id}
+                className="group bg-white rounded-3xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500"
+              >
+                <Link to={`/productDetail/${product.id}`} className="block">
+                  <div className="aspect-square bg-slate-50 relative overflow-hidden">
+                    <img
+                      src={
+                        product.image_url ||
+                        `https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=400`
+                      }
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
 
-                  {/* Stock Badge */}
-                  {product.stock > 0 && (
-                    <span
-                      className={`absolute top-4 left-4 text-[11px] font-bold px-3 py-1 rounded-full uppercase shadow-md ${
-                        product.stock < 10
-                          ? "bg-red-500 text-white"
-                          : "bg-slate-200 text-slate-700"
-                      }`}
-                    >
-                      {product.stock < 10
-                        ? `¡Quedan ${product.stock}!`
-                        : `${product.stock} disponibles`}
-                    </span>
-                  )}
-                </div>
-                <div className="p-6 space-y-4">
-                  <h3 className="font-bold text-slate-800">{product.name}</h3>
-
-                  <div className="flex items-center text-amber-400">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Star
-                        key={i}
-                        size={12}
-                        fill={
-                          i <= Math.round(averageRating)
-                            ? "currentColor"
-                            : "none"
-                        }
-                      />
-                    ))}
-                    <span className="text-[10px] text-slate-400 font-bold ml-1">
-                      ({reviewCount})
-                    </span>
+                    {/* Stock Badge */}
+                    {product.stock > 0 && (
+                      <span
+                        className={`absolute top-4 left-4 text-[11px] font-bold px-3 py-1 rounded-full uppercase shadow-md ${
+                          product.stock < 10
+                            ? "bg-red-500 text-white"
+                            : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {product.stock < 10
+                          ? `¡Quedan ${product.stock}!`
+                          : `${product.stock} disponibles`}
+                      </span>
+                    )}
                   </div>
-                </div>
-              </Link>
-            </div>
-          );
-        })}
+
+                  <div className="p-6 space-y-4">
+                    <h3 className="font-bold text-slate-800">
+                      {product.name}
+                    </h3>
+
+                    <div className="flex items-center text-amber-400">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <Star
+                          key={i}
+                          size={12}
+                          fill={
+                            i <= Math.round(averageRating)
+                              ? "currentColor"
+                              : "none"
+                          }
+                        />
+                      ))}
+                      <span className="text-[10px] text-slate-400 font-bold ml-1">
+                        ({reviewCount})
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            );
+          })
+        )}
       </div>
       <WhyUs />
       <Testimonials />

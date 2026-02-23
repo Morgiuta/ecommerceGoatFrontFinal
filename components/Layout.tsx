@@ -22,7 +22,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <aside className="w-72 bg-slate-900 flex flex-col shrink-0">
         <div className="p-8">
            <h2 className="text-2xl font-black text-white tracking-tighter">
-             VORTEX<span className="text-indigo-500">ADMIN</span>
+             GOAT<span className="text-indigo-500">ADMIN</span>
            </h2>
         </div>
         
@@ -47,10 +47,6 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <Store size={22} />
               <span>Ver Tienda</span>
            </Link>
-           <button className="w-full flex items-center gap-3 px-6 py-3 text-slate-400 font-bold hover:text-rose-500 transition-colors">
-              <LogOut size={22} />
-              <span>Salir</span>
-           </button>
         </div>
       </aside>
 

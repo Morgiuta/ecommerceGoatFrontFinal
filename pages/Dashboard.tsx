@@ -5,6 +5,20 @@ import {
   Users, ShoppingCart, Package, TrendingUp, 
   Activity, AlertCircle, RefreshCw, ChevronRight 
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import {
+  ResponsiveContainer,
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend
+} from 'recharts';
+import { Status } from '../types';
+
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState({
@@ -15,6 +29,8 @@ const Dashboard: React.FC = () => {
   });
   const [health, setHealth] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [dailySales, setDailySales] = useState<any[]>([]);
+
 
   const loadData = async () => {
     setLoading(true);
@@ -26,12 +42,40 @@ const Dashboard: React.FC = () => {
         ecommerceService.getHealth()
       ]);
 
+      // Filtrar canceladas
+      const validOrders = oRes.data.filter(o => o.status !== Status.CANCELED);
+
+      const salesByDay: Record<string, { total: number; count: number }> = {};
+
+      validOrders.forEach(order => {
+        const day = order.date.split('T')[0];
+
+        if (!salesByDay[day]) {
+          salesByDay[day] = { total: 0, count: 0 };
+        }
+
+        salesByDay[day].total += order.total;
+        salesByDay[day].count += 1;
+      });
+
+      const formattedSales = Object.entries(salesByDay)
+        .map(([date, values]) => ({
+          date,
+          total: values.total,
+          count: values.count
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      setDailySales(formattedSales);
+
       setStats({
         clients: cRes.data.length,
         products: pRes.data.length,
-        orders: oRes.data.length,
-        revenue: oRes.data.reduce((acc, o) => acc + o.total, 0)
+        orders: validOrders.length,
+        revenue: validOrders.reduce((acc, o) => acc + o.total, 0)
       });
+
+
       setHealth(hRes.data);
     } catch (err) {
       console.error(err);
@@ -44,10 +88,11 @@ const Dashboard: React.FC = () => {
 
   const metricCards = [
     { label: 'Clientes', value: stats.clients, icon: Users, color: 'bg-blue-500' },
-    { label: 'Ventas', value: stats.orders, icon: ShoppingCart, color: 'bg-indigo-500' },
-    { label: 'Productos', value: stats.products, icon: Package, color: 'bg-purple-500' },
+    { label: 'Ventas', value: stats.orders, icon: ShoppingCart, color: 'bg-indigo-500', link: '/admin/orders' },
+    { label: 'Productos', value: stats.products, icon: Package, color: 'bg-purple-500', link: '/admin/products' },
     { label: 'Ingresos', value: `$${stats.revenue.toLocaleString()}`, icon: TrendingUp, color: 'bg-emerald-500' },
   ];
+  
 
   return (
     <div className="space-y-8">
@@ -62,49 +107,62 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {metricCards.map((m, idx) => (
-          <div key={idx} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all group">
+      {metricCards.map((m, idx) => {
+        const CardContent = (
+          <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all group cursor-pointer">
             <div className={`w-12 h-12 ${m.color} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg shadow-indigo-200 group-hover:scale-110 transition-transform`}>
               <m.icon size={24} />
             </div>
             <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{m.label}</p>
             <p className="text-4xl font-black text-slate-900">{m.value}</p>
+
+            {m.link && (
+              <p className="mt-4 text-sm font-bold text-indigo-600 flex items-center gap-1">
+                {m.label === 'Ventas' ? 'Ir a ventas' : 'Ir a productos'}
+                <ChevronRight size={16} />
+              </p>
+            )}
           </div>
-        ))}
+        );
+
+        return m.link ? (
+          <Link key={idx} to={m.link}>
+            {CardContent}
+          </Link>
+        ) : (
+          <div key={idx}>{CardContent}</div>
+        );
+      })}
+
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold">Salud del Sistema</h3>
-            <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase ${health?.status === 'healthy' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-              {health?.status || 'Buscando...'}
-            </span>
-          </div>
+      {/* GRAFICO UNICO */}
+      <div className="mt-8">
+        <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm w-full">
           
-          <div className="space-y-4">
-            {health?.checks && Object.entries(health.checks).map(([key, value]: [any, any]) => (
-              <div key={key} className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-colors">
-                 <div className="flex items-center gap-4">
-                   <div className={`w-2 h-2 rounded-full ${value.status === 'up' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
-                   <span className="font-bold text-slate-700 capitalize">{key}</span>
-                 </div>
-                 <div className="text-right">
-                    <p className="text-xs font-bold text-slate-400">{value.latency_ms ? `${value.latency_ms}ms` : 'Activo'}</p>
-                    {value.health && <p className="text-[10px] text-indigo-500 font-black uppercase">{value.health}</p>}
-                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-6">
+            Ventas por Día (Mes Actual)
+          </h3>
 
-        <div className="lg:col-span-4 space-y-6">
-           <div className="bg-indigo-600 p-8 rounded-[2.5rem] text-white space-y-6 shadow-2xl shadow-indigo-600/20">
-              <Activity size={32} className="text-indigo-200" />
-              <h3 className="text-xl font-bold">Estado del Almacén</h3>
-              <p className="text-indigo-100 text-sm leading-relaxed">Hay productos con bajo stock. Se recomienda revisar el inventario y reabastecer para evitar interrupciones en ventas.</p>
-              <button className="w-full bg-white text-indigo-600 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-colors">Ver Alertas</button>
-           </div>
+          <div className="w-full h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={dailySales}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+
+              <Bar
+                dataKey="count"
+                fill="#6366F1"
+                radius={[6, 6, 0, 0]}
+                name="Cantidad de Ventas"
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+          </div>
+
         </div>
       </div>
     </div>

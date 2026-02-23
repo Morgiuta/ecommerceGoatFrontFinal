@@ -1,6 +1,6 @@
 
-//import api, {apiRoot} from './api';
-import api from './api';
+import api, {apiRoot} from './api';
+//import api from './api';
 //import { apiRoot } from './api';
 
 import { 
@@ -193,6 +193,6 @@ export const ecommerceService = {
     api.delete(`/cart/${clientId}/items/${productId}`),
 
   // Health check - Consistente con 127.0.0.1
-  getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
-  //getHealth: () => apiRoot.get<HealthStatus>('health_check/'),
+  //getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
+  getHealth: () => apiRoot.get<HealthStatus>('health_check/'),
 };

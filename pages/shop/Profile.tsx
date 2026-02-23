@@ -310,7 +310,7 @@ const Profile: React.FC = () => {
                           ${Number(bill.total || 0).toFixed(2)}
                         </p>
 
-                        <button onClick={() => generarPDF()} className="text-xs font-bold text-blue-600 hover:underline">
+                        <button onClick={() => generarPDF(bill.total,bill.id_key, bill.order_id)} className="text-xs font-bold text-blue-600 hover:underline">
                           Descargar PDF
                         </button>
                       </div>

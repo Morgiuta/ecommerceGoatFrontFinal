@@ -29,7 +29,7 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           <Link to="/" className="text-2xl font-black text-indigo-600 tracking-tighter shrink-0">
@@ -87,7 +87,7 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8 flex-1 w-full">
         {children}
       </main>
 
@@ -147,7 +147,6 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
           </div>
         </div>
       </footer>
-
     </div>
   );
 };

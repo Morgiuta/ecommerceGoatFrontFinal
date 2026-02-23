@@ -54,10 +54,10 @@ const Profile: React.FC = () => {
         
         setOrders(userOrders);
   
-        const userBills = billRes.data.filter(bill =>
-          userOrders.some(order => order.id === bill.order_id)
+        const userBills = billRes.data.filter(
+          (bill: Bill) => Number(bill.client_id) === numericClientId
         );
-  
+        
         const orderedBills = userBills.sort(
           (a: Bill, b: Bill) =>
             new Date(b.date).getTime() - new Date(a.date).getTime()

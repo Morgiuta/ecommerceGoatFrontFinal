@@ -35,9 +35,15 @@ const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 <div className="min-h-screen bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 font-sans text-slate-900 flex flex-col transition-colors duration-500">
       <nav className="bg-white/70 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-50 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-          <Link to="/" className="text-2xl font-black text-indigo-600 tracking-tighter shrink-0">
-            GOAT<span className="text-slate-900">ECH</span>
-          </Link>
+         <motion.div
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+>
+  <Link to="/" className="text-2xl font-black text-indigo-600 tracking-tighter shrink-0">
+    GOAT<span className="text-slate-900">ECH</span>
+  </Link>
+</motion.div>
+
           <div className="hidden md:flex flex-1 max-w-md relative">
              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
              <input 

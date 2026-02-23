@@ -195,7 +195,4 @@ export const ecommerceService = {
   // Health check - Consistente con 127.0.0.1
   //getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
   getHealth: () => apiRoot.get<HealthStatus>('health_check/'),
-  //getHealth: () => api.get<HealthStatus>('http://127.0.0.1:8000/health_check/'),
-  getHealth: () => apiRoot.get<HealthStatus>('health_check/'),
-
 };

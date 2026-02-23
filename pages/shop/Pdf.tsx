@@ -21,7 +21,7 @@ console.log(order, "hola")
 
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text(`N° ${order.bill?.bill_number}`, 105, 28, { align: "center" });
+  doc.text(`N° ${order[0].bill?.bill_number}`, 105, 28, { align: "center" });
 
   doc.line(20, 35, 190, 35);
 
@@ -34,17 +34,17 @@ console.log(order, "hola")
 
   doc.setFont("helvetica", "normal");
   doc.text(
-    `${order.client?.name} ${order.client?.lastname}`,
+    `${order[0].client?.name} ${order[0].client?.lastname}`,
     20,
     58
   );
-  doc.text(order.client?.email || "", 20, 66);
+  doc.text(order[0].client?.email || "", 20, 66);
 
   // =========================
   // INFO FACTURA
   // =========================
-  doc.text(`Fecha: ${order.bill?.date}`, 140, 58);
-  doc.text(`Pago: ${order.bill?.payment_type}`, 140, 66);
+  doc.text(`Fecha: ${order[0].bill?.date}`, 140, 58);
+  doc.text(`Pago: ${order[0].bill?.payment_type}`, 140, 66);
 
   // =========================
   // DETALLES PRODUCTOS
@@ -57,7 +57,7 @@ console.log(order, "hola")
 
   doc.setFont("helvetica", "normal");
 
-  order.details?.forEach((detail) => {
+  order[0].details?.forEach((detail) => {
     const subtotal = detail.quantity * detail.price;
 
     doc.text(detail.product?.name || "Producto", 20, y);
@@ -78,7 +78,7 @@ console.log(order, "hola")
   doc.setFont("helvetica", "bold");
 
   doc.text(
-    `Total: ${formatCurrency(order.bill?.total || 0)}`,
+    `Total: ${formatCurrency(order[0].bill?.total || 0)}`,
     140,
     y
   );
@@ -92,5 +92,5 @@ console.log(order, "hola")
     align: "center",
   });
 
-  doc.save(`Factura-${order.bill?.bill_number}.pdf`);
+  doc.save(`Factura-${order[0].bill?.bill_number}.pdf`);
 };

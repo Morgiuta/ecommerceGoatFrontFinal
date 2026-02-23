@@ -1,23 +1,7 @@
-import React from 'react';
+import jsPDF from "jspdf";
 
-function PDFDownload() {
-  const handleDownload = async () => {
-    const response = await fetch('http://tu-servidor/pdf');
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'ejemplo.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  return (
-    <div>
-      <button onClick={handleDownload}>Descargar PDF</button>
-    </div>
-  );
-}
-
-export default PDFDownload;
+export const generarPDF = () => {
+  const doc = new jsPDF();
+  doc.text("Hola Tomas 🚀", 10, 10);
+  doc.save("archivo.pdf");
+};

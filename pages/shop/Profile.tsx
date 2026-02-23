@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ecommerceService } from '../../services/ecommerceService';
 import { Order, Bill, Status } from '../../types';
 import { User, Package, FileText, ChevronRight, LogOut, Clock , Pencil} from 'lucide-react';
-import PDFDownload from './Pdf';
+import { generarPDF } from './Pdf';
 
 const Profile: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -310,7 +310,7 @@ const Profile: React.FC = () => {
                           ${Number(bill.total || 0).toFixed(2)}
                         </p>
 
-                        <button onClick={() => PDFDownload()} className="text-xs font-bold text-blue-600 hover:underline">
+                        <button onClick={() => generarPDF()} className="text-xs font-bold text-blue-600 hover:underline">
                           Descargar PDF
                         </button>
                       </div>

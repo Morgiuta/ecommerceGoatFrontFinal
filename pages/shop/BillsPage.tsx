@@ -9,14 +9,30 @@ const BillsPage: React.FC = () => {
 
   useEffect(() => {
     const fetchBills = async () => {
-      const res = await ecommerceService.getBills();
+      try {
+        const storedUser = JSON.parse(
+          localStorage.getItem("vortex_user") || "{}"
+        );
 
-      const ordered = res.data.sort(
-        (a: Bill, b: Bill) =>
-          new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
+        const clientId = Number(storedUser?.id_key);
 
-      setBills(ordered);
+        if (!clientId) return;
+
+        const res = await ecommerceService.getBills();
+
+        const filtered = res.data.filter(
+          (bill: Bill) => bill.client_id === clientId
+        );
+
+        const ordered = filtered.sort(
+          (a: Bill, b: Bill) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        setBills(ordered);
+      } catch (error) {
+        console.error("Error cargando facturas:", error);
+      }
     };
 
     fetchBills();

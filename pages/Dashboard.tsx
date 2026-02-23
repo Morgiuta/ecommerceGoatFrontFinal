@@ -88,8 +88,8 @@ const Dashboard: React.FC = () => {
 
   const metricCards = [
     { label: 'Clientes', value: stats.clients, icon: Users, color: 'bg-blue-500' },
-    { label: 'Ventas', value: stats.orders, icon: ShoppingCart, color: 'bg-indigo-500', link: '/orders' },
-    { label: 'Productos', value: stats.products, icon: Package, color: 'bg-purple-500', link: '/products' },
+    { label: 'Ventas', value: stats.orders, icon: ShoppingCart, color: 'bg-indigo-500', link: '/admin/orders' },
+    { label: 'Productos', value: stats.products, icon: Package, color: 'bg-purple-500', link: '/admin/products' },
     { label: 'Ingresos', value: `$${stats.revenue.toLocaleString()}`, icon: TrendingUp, color: 'bg-emerald-500' },
   ];
   

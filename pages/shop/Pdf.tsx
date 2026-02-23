@@ -1,6 +1,9 @@
 import jsPDF from "jspdf";
 import { Order } from "@/types";
 export const generarPDF = (order: Order) => {
+
+console.log(order)
+
   const doc = new jsPDF();
 
   const formatCurrency = (value: number) =>

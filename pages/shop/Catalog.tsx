@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ecommerceService } from "../../services/ecommerceService";
 import { Product, Category } from "../../types";
 import { useCart } from "../../context/CartContext";
+import {motion} from "framer-motion";
 import {
   Plus,
   ShoppingBag,
@@ -68,9 +69,19 @@ const Catalog: React.FC = () => {
   const reviewCount = products.reviews?.length || 0;
 
   return (
-    <div className="space-y-10">
+<motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ duration: 0.6 }}
+  className="space-y-14"
+>
       {/* Hero */}
-      <section className="relative h-64 md:h-80 rounded-[2.5rem] bg-indigo-600 overflow-hidden flex items-center px-8 md:px-16">
+<motion.section
+  initial={{ opacity: 0, y: 40 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, ease: "easeOut" }}
+  className="relative h-64 md:h-80 rounded-[2.5rem] bg-gradient-to-br from-indigo-600 via-indigo-500 to-indigo-700 overflow-hidden flex items-center px-8 md:px-16 shadow-2xl shadow-indigo-500/20"
+>
         <div className="absolute right-0 top-0 w-1/2 h-full bg-white/10 skew-x-12 translate-x-1/4"></div>
         <div className="relative z-10 space-y-4 max-w-xl">
           <span className="bg-indigo-400/30 text-indigo-100 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
@@ -83,7 +94,7 @@ const Catalog: React.FC = () => {
             Hasta 12 cuotas sin interés en productos seleccionados.
           </p>
         </div>
-      </section>
+      </motion.section>
 
         <AboutUs />
       {/* Filter Bar */}
@@ -96,18 +107,26 @@ const Catalog: React.FC = () => {
         </button>
         {categories.map((cat) => (
           /* Fixed: accessing cat.id instead of non-existent cat.id_key */
-          <button
-            key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
-            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeCategory === cat.id ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "bg-white border text-slate-500 hover:bg-slate-50"}`}
-          >
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+  whileHover={{ y: -2 }}
+  onClick={() => setActiveCategory(cat.id)}
+  className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
+    activeCategory === cat.id
+      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
+      : "bg-white border text-slate-500 hover:bg-slate-50"
+  }`}>
             {cat.name}
-          </button>
+          </motion.button>
         ))}
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <motion.div
+  layout
+  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+>
+
         {loading ? (
           <>
             {Array.from({ length: 8 }).map((_, index) => (
@@ -134,10 +153,17 @@ const Catalog: React.FC = () => {
             console.log("⭐ DEBUG:", product.name, averageRating, reviewCount);
 
             return (
-              <div
-                key={product.id}
-                className="group bg-white rounded-3xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-500"
-              >
+              <motion.div
+  key={product.id}
+  layout
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  exit={{ opacity: 0, y: 20 }}
+  transition={{ duration: 0.4 }}
+  whileHover={{ y: -8 }}
+  className="group bg-white rounded-3xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500"
+>
+
                 <Link to={`/productDetail/${product.id}`} className="block">
                   <div className="aspect-square bg-slate-50 relative overflow-hidden">
                     <img
@@ -146,7 +172,7 @@ const Catalog: React.FC = () => {
                         `https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=400`
                       }
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+className="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-transform duration-700 ease-out"
                     />
 
                     {/* Stock Badge */}
@@ -188,15 +214,15 @@ const Catalog: React.FC = () => {
                     </div>
                   </div>
                 </Link>
-              </div>
+              </motion.div>
             );
           })
         )}
-      </div>
+      </motion.div>
       <WhyUs />
       <Testimonials />
       <Faq />
-    </div>
+    </motion.div>
   );
 };
 

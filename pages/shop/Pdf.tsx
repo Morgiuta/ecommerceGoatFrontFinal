@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import { Order } from "@/types";
 export const generarPDF = (order: Order) => {
 
-console.log(order)
+console.log(order, "hola")
 
   const doc = new jsPDF();
 

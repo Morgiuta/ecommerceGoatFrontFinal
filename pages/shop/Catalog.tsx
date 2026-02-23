@@ -104,6 +104,7 @@ const Catalog: React.FC = () => {
           </button>
         ))}
       </div>
+        <AboutUs />
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -174,9 +175,8 @@ const Catalog: React.FC = () => {
           );
         })}
       </div>
-      <AboutUs />
-      <Testimonials />
       <WhyUs />
+      <Testimonials />
       <Faq />
     </div>
   );
